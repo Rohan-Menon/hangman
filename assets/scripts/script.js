@@ -11,16 +11,20 @@ function setUpGame(){
   
 
 
+    
+
 
     guesses=12;
     var attemptsDiv = document.getElementById("attemptsLeftDiv");
-    attemptsDiv.innerHTML=guesses;
+    attemptsDiv.innerHTML="Attempts Left: " + guesses;
     
     var guessSpaceDiv = document.getElementById("guessSpace");
     
 
     if(typeof(guessWord)!='undefined')
     {
+        document.getElementById("winDisplayDiv").innerHTML="";
+        document.getElementById("winDisplayDiv").removeAttribute("onclick");
         for(var i=0; i<guessWord.length; i++)
         {
             if(guessWord[i]===" ")
@@ -66,6 +70,7 @@ function setUpGame(){
         guessSpaceDiv.appendChild(newLetterSpace);
     }
 
+    acceptKeyInput();
 
 }
 
@@ -79,60 +84,73 @@ function displayWrongLetter(letter){
     wrongLetterDiv.appendChild(newWrongLetter);
 }
 
-
-document.addEventListener("keyup", function(event) {
-    if(/^[a-zA-Z]/.test(event.key))
-    {
-
-        var key = event.key.toLowerCase();
-        var foundLetter = false;
-        for(var i=0; i<guessWord.length; i++)
+function acceptKeyInput()
+{
+    document.addEventListener("keyup", function keyPressed(event) {
+        if(/^[a-zA-Z]/.test(event.key))
         {
-            if(key===guessWord[i])
+    
+            var key = event.key.toLowerCase();
+            var foundLetter = false;
+            for(var i=0; i<guessWord.length; i++)
             {
-                var correctLetterDiv = document.getElementById("letter"+i);
-                correctLetterDiv.innerHTML=guessWord[i];
-                foundLetter = true;
-                lettersLeft-=1;
+                if(key===guessWord[i])
+                {
+                    var correctLetterDiv = document.getElementById("letter"+i);
+                    correctLetterDiv.innerHTML=guessWord[i];
+                    foundLetter = true;
+                    lettersLeft-=1;                    
+                }
+            }
+    
+            if(lettersLeft===0)
+                    {
+                        //document.removeEventListener("keyup", keyPressed(event));
+
+                        var winDisplay = document.getElementById("winDisplayDiv");
+    
+                        winDisplay.innerHTML="YOU WIN";
+                        winDisplay.setAttribute("class", "text-center");
+                        winDisplay.style.color='#ff0000';
+                        winDisplay.style.fontSize='100px';
+                        winDisplay.style.marginTop='100px';
+                       
+    
+                        wins+=1;
+                        document.getElementById("winCounterDiv").innerHTML= "Wins: "+wins;
+                        document.getElementById("winDisplayDiv").setAttribute("onclick", "setUpGame()");
+                 
+    
+                    }
+    
+            if(!foundLetter)
+            {
+                
+                
+                if(wrongLettersArray.indexOf(key)<0){
+                    guesses-=1;
+                    document.getElementById("attemptsLeftDiv").innerHTML="Attempts Left: " +guesses;
+                    wrongLettersArray.push(key);
+                    displayWrongLetter(key);
+                }
                 
             }
-        }
-
-        if(lettersLeft===0)
-                {
-                    if(guessWord==="watermelon")
-                    {
-                        alert("DO YOU HAVE WATERMELON!!!!!!!!!!");
-                    }
-                    else{
-                                            alert("YOU WIN");
-
-                    }
-                    wins+=1;
-                    document.getElementById("winCounterDiv").innerHTML= "Wins"+wins;
-                    setUpGame();
-                }
-
-        if(!foundLetter)
-        {
-            
-            
-            if(wrongLettersArray.indexOf(key)<0){
-                guesses-=1;
-                document.getElementById("attemptsLeftDiv").innerHTML=guesses;
-                wrongLettersArray.push(key);
-                displayWrongLetter(key);
+    
+            if(guesses===0)
+            {
+                //document.removeEventListener("keyup", keyPressed(event));
+                var winDisplay = document.getElementById("winDisplayDiv");
+                winDisplay.innerHTML="YOU LOSE";
+                winDisplay.setAttribute("class", "text-center");
+                winDisplay.setAttribute("onclick", "setUpGame()");
+                winDisplay.style.color='#ff0000';
+                winDisplay.style.fontSize='40px';
+    
             }
-            
         }
+    });
+}
 
-        if(guesses===0)
-        {
-            alert("YOU LOSE");
-            setUpGame();
-        }
-    }
-});
 
 
 setUpGame();
